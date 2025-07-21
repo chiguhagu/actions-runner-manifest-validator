@@ -1,9 +1,9 @@
 name: Build & Publish on Release
 
 on:
-  release:
-    types: [published]    # draft:false, prerelease:false のときに発火
-  workflow_dispatch:
+  push:
+    tags:
+      - '*'
 
 jobs:
   build-and-push:
