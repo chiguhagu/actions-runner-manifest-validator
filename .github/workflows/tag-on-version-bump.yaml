@@ -1,0 +1,40 @@
+# .github/workflows/tag-on-version-bump.yml
+name: Tag on Version Bump (composite semver)
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - Dockerfile
+
+jobs:
+  tag-version:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Extract all tool versions
+        id: extract
+        run: |
+          RUNNER_VERSION=$(grep -E '^ARG RUNNER_VERSION=' Dockerfile | cut -d'=' -f2)
+          HELM_VERSION=$(grep -E '^ARG HELM_VERSION=' Dockerfile | cut -d'=' -f2)
+          KUSTOMIZE_VERSION=$(grep -E '^ARG KUSTOMIZE_VERSION=' Dockerfile | cut -d'=' -f2)
+          CONFTEST_VERSION=$(grep -E '^ARG CONFTEST_VERSION=' Dockerfile | cut -d'=' -f2)
+          KUBECONFORM_VERSION=$(grep -E '^ARG KUBECONFORM_VERSION=' Dockerfile | cut -d'=' -f2)
+          COMPOSITE="${RUNNER_VERSION}-helm${HELM_VERSION}-kustomize${KUSTOMIZE_VERSION}-conftest${CONFTEST_VERSION}-kubeconform${KUBECONFORM_VERSION}"
+          echo "composite=$COMPOSITE" >> $GITHUB_OUTPUT
+
+      - name: Create Git tag & Release
+        uses: actions/create-release@v1
+        with:
+          tag_name: ${{ steps.extract.outputs.composite }}
+          release_name: "Runner ${{ steps.extract.outputs.composite }}"
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

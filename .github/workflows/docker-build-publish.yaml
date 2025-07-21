@@ -1,0 +1,59 @@
+name: Build & Publish on Tag
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  build-and-push:
+    name: Build and Push Docker Image
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up QEMU (for cross-platform emulation)
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+        with:
+          buildkitd-flags: --debug
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Determine image tags
+        id: vars
+        run: |
+          # Git ref が refs/tags/v2.326.0-helm3.18.4… の形なので、先頭 prefix を削除
+          FULL_REF=${GITHUB_REF#refs/tags/}
+          COMPOSITE=${FULL_REF#v} 
+          
+          # RUNNER_VERSION 部分だけ取り出す（先頭のセグメント）
+          RUNNER=${COMPOSITE%%[-+]*}
+
+          echo "composite=${COMPOSITE}" >> $GITHUB_OUTPUT
+          echo "runner=${RUNNER}"     >> $GITHUB_OUTPUT
+
+      - name: Build and push multi-arch image
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: ./Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/actions-runner-manifest-validator:latest
+            ghcr.io/${{ github.repository_owner }}/actions-runner-manifest-validator:${{ steps.vars.outputs.runner }}
+            ghcr.io/${{ github.repository_owner }}/actions-runner-manifest-validator:${{ steps.vars.outputs.composite }}

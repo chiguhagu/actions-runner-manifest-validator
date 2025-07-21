@@ -1,0 +1,41 @@
+{
+  "extends": ["config:base"],
+  "labels": ["renovate"],
+  "regexManagers": [
+    {
+      "fileMatch": ["^Dockerfile$"],
+      "matchStrings": ["^ARG RUNNER_VERSION=(?<currentValue>\\d+\\.\\d+\\.\\d+)$"],
+      "depNameTemplate": "actions/runner",
+      "datasourceTemplate": "github-tags",
+      "extractVersionTemplate": "^v?(?<version>\\d+\\.\\d+\\.\\d+)$"
+    },
+    {
+      "fileMatch": ["^Dockerfile$"],
+      "matchStrings": ["^ARG CONFTEST_VERSION=(?<currentValue>\\d+\\.\\d+\\.\\d+)$"],
+      "depNameTemplate": "open-policy-agent/conftest",
+      "datasourceTemplate": "github-tags",
+      "extractVersionTemplate": "^v?(?<version>\\d+\\.\\d+\\.\\d+)$"
+    },
+    {
+      "fileMatch": ["^Dockerfile$"],
+      "matchStrings": ["^ARG KUBECONFORM_VERSION=(?<currentValue>\\d+\\.\\d+\\.\\d+)$"],
+      "depNameTemplate": "yannh/kubeconform",
+      "datasourceTemplate": "github-tags",
+      "extractVersionTemplate": "^v?(?<version>\\d+\\.\\d+\\.\\d+)$"
+    },
+    {
+      "fileMatch": ["^Dockerfile$"],
+      "matchStrings": ["^ARG KUSTOMIZE_VERSION=(?<currentValue>\\d+\\.\\d+\\.\\d+)$"],
+      "depNameTemplate": "kubernetes-sigs/kustomize",
+      "datasourceTemplate": "github-tags",
+      "extractVersionTemplate": "^kustomize/v(?<version>\\d+\\.\\d+\\.\\d+)$"
+    },
+    {
+      "fileMatch": ["^Dockerfile$"],
+      "matchStrings": ["^ARG HELM_VERSION=(?<currentValue>\\d+\\.\\d+\\.\\d+)$"],
+      "depNameTemplate": "helm/helm",
+      "datasourceTemplate": "github-tags",
+      "extractVersionTemplate": "^v?(?<version>\\d+\\.\\d+\\.\\d+)$"
+    }
+  ]
+}
