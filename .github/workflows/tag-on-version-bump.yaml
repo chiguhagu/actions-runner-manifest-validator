@@ -33,8 +33,8 @@ jobs:
       - name: Create Git tag & Release
         uses: actions/create-release@v1
         with:
-          tag_name: ${{ trim(steps.extract.outputs.composite) }}
-          release_name: "Runner ${{ trim(steps.extract.outputs.composite) }}"
+          tag_name: ${{ steps.extract.outputs.composite }}
+          release_name: "Runner ${{ steps.extract.outputs.composite }}"
           draft: false
           prerelease: false
         env:
