@@ -21,19 +21,20 @@ jobs:
       - name: Extract all tool versions
         id: extract
         run: |
-          RUNNER_VERSION=$(grep -E '^ARG RUNNER_VERSION=' Dockerfile | cut -d'=' -f2)
-          HELM_VERSION=$(grep -E '^ARG HELM_VERSION=' Dockerfile | cut -d'=' -f2)
-          KUSTOMIZE_VERSION=$(grep -E '^ARG KUSTOMIZE_VERSION=' Dockerfile | cut -d'=' -f2)
-          CONFTEST_VERSION=$(grep -E '^ARG CONFTEST_VERSION=' Dockerfile | cut -d'=' -f2)
-          KUBECONFORM_VERSION=$(grep -E '^ARG KUBECONFORM_VERSION=' Dockerfile | cut -d'=' -f2)
-          COMPOSITE="${RUNNER_VERSION}-helm${HELM_VERSION}-kustomize${KUSTOMIZE_VERSION}-conftest${CONFTEST_VERSION}-kubeconform${KUBECONFORM_VERSION}"
+          sed -i 's/\r$//' Dockerfile
+          RUNNER_VERSION=$(grep -E '^ARG RUNNER_VERSION=' Dockerfile | cut -d'=' -f2 | tr -d '\r\n')
+          HELM_VERSION=$(grep -E '^ARG HELM_VERSION=' Dockerfile | cut -d'=' -f2 | tr -d '\r\n')
+          KUSTOMIZE_VERSION=$(grep -E '^ARG KUSTOMIZE_VERSION=' Dockerfile | cut -d'=' -f2 | tr -d '\r\n')
+          CONFTEST_VERSION=$(grep -E '^ARG CONFTEST_VERSION=' Dockerfile | cut -d'=' -f2 | tr -d '\r\n')
+          KUBECONFORM_VERSION=$(grep -E '^ARG KUBECONFORM_VERSION=' Dockerfile | cut -d'=' -f2 | tr -d '\r\n')
+          COMPOSITE="v${RUNNER_VERSION}-helm${HELM_VERSION}-kustomize${KUSTOMIZE_VERSION}-conftest${CONFTEST_VERSION}-kubeconform${KUBECONFORM_VERSION}"
           echo "composite=$COMPOSITE" >> $GITHUB_OUTPUT
 
       - name: Create Git tag & Release
         uses: actions/create-release@v1
         with:
-          tag_name: ${{ steps.extract.outputs.composite }}
-          release_name: "Runner ${{ steps.extract.outputs.composite }}"
+          tag_name: ${{ trim(steps.extract.outputs.composite) }}
+          release_name: "Runner ${{ trim(steps.extract.outputs.composite) }}"
           draft: false
           prerelease: false
         env:
