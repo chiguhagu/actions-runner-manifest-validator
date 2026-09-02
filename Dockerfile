@@ -1,4 +1,4 @@
-# syntax=docker/dockerfile:1.17
+# syntax=docker/dockerfile:1.27
 ARG RUNNER_VERSION=2.327.1
 
 FROM --platform=${TARGETPLATFORM} ghcr.io/actions/actions-runner:${RUNNER_VERSION}
